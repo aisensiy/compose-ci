@@ -8,7 +8,6 @@ RUN apk add --no-cache \
     curl \
     unzip \
     aha@testing \
-    mutt \
     bash \
     && pip install docker-compose awscli \
     && rm -rf \
@@ -18,6 +17,7 @@ RUN apk add --no-cache \
         $(find / -regex '.*\.py[co]')
 
 EXPOSE 80
+ENV DOCKER_HOST=unix://var/run/docker.sock
 
 CMD ["python", "/httpd.py"]
 

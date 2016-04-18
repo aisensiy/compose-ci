@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -exuo pipefail # stop on failure
+
+if [ -n ${DOCKER_REGISTRY-} ]; then
+    docker login -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PASS} ${DOCKER_REGISTRY}
+fi
+
+if [ -n ${AWS_ECR_REGISTRY-} ]; then
+    eval $(aws ecr get-login)
+fi
+
+docker-compose pull
+docker-compose build
+docker-compose up -d
+docker-compose run tests
+
+if [ -z ${DOCKER_REGISTRY_TAG+x} ]; then
+    return
+fi
+python /push.py ${DOCKER_REGISTRY_TAG-$short_commit}
